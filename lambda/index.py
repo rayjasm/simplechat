@@ -4,6 +4,7 @@ import os
 import boto3
 import re  # 正規表現モジュールをインポート
 from botocore.exceptions import ClientError
+import urllib.request
 
 
 # Lambda コンテキストからリージョンを抽出する関数
@@ -82,15 +83,43 @@ def lambda_handler(event, context):
         
         print("Calling Bedrock invoke_model API with payload:", json.dumps(request_payload))
         
-        # invoke_model APIを呼び出し
-        response = bedrock_client.invoke_model(
-            modelId=MODEL_ID,
-            body=json.dumps(request_payload),
-            contentType="application/json"
+        # FastAPIのエンドポイント
+        url = "https://6b4c-34-106-84-184.ngrok-free.app/generate"
+
+        data = {
+            "prompt": message,
+            "max_new_tokens": 512,
+            "temperature": 0.7,
+            "top_p": 0.9
+        }
+
+        # JSONデータをエンコード
+        json_data = json.dumps(data).encode("utf-8")
+
+        # リクエストオブジェクト作成
+        req = urllib.request.Request(
+            url,
+            data=json_data,
+            headers={"Content-Type": "application/json"},
+            method="POST"
         )
+
+        # 実行＆レスポンス取得
+        with urllib.request.urlopen(req) as res:
+            print("Ngrok status code:", res.status)
+            response_text = res.read().decode("utf-8")
+            response_body = json.loads(response_text)
+            print("Ngrok response body:", response_body)
+
+        # invoke_model APIを呼び出し
+        # response = bedrock_client.invoke_model(
+        #     modelId=MODEL_ID,
+        #     body=json.dumps(request_payload),
+        #     contentType="application/json"
+        # )
         
         # レスポンスを解析
-        response_body = json.loads(response['body'].read())
+        # response_body = json.loads(response['body'].read())
         print("Bedrock response:", json.dumps(response_body, default=str))
         
         # 応答の検証
