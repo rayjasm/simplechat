@@ -123,8 +123,7 @@ def lambda_handler(event, context):
         print("Bedrock response:", json.dumps(response_body, default=str))
         
         # 応答の検証
-        # assistant_response = response_body.get('generated_text')
-        assistant_response = response_body
+        assistant_response = response_body.get('generated_text')
         if not assistant_response:
             raise Exception("No response content from the model")
 
