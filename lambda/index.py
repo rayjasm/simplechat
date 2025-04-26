@@ -84,7 +84,7 @@ def lambda_handler(event, context):
         print("Calling Bedrock invoke_model API with payload:", json.dumps(request_payload))
         
         # FastAPIのエンドポイント
-        url = "https://6b4c-34-106-84-184.ngrok-free.app/generate"
+        url = "https://4038-34-124-245-220.ngrok-free.app/generate"
 
         data = {
             "prompt": message,
